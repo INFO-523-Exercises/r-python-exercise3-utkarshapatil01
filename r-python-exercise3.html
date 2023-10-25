@@ -251,6 +251,7 @@ node), split, n, loss, yval, (yprob)
 </section>
 <section id="create-a-full-tree" class="level3">
 <h3 class="anchored" data-anchor-id="create-a-full-tree"><strong>Create a Full Tree</strong></h3>
+<p>To create a full tree, we set the complexity parameter cp to 0 (split even if it does not improve the tree) and we set the minimum number of observations in a node needed to split to the smallest value of 2.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>tree_full <span class="ot">&lt;-</span> Zoo <span class="sc">|&gt;</span> </span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rpart</span>(type <span class="sc">~</span> . , <span class="at">data =</span> _, </span>
@@ -263,6 +264,7 @@ node), split, n, loss, yval, (yprob)
 <p><img src="r-python-exercise3_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>When <strong>cp = 0</strong> This means that no cost complexity pruning is applied. In other words, the tree is allowed to grow until it perfectly fits the training data, which can result in a very complex, deep, and overfit tree.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>tree_full</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -332,15 +334,17 @@ type            mammal bird reptile fish amphibian insect mollusc.et.al
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>correct <span class="ot">&lt;-</span> confusion_table <span class="sc">|&gt;</span> <span class="fu">diag</span>() <span class="sc">|&gt;</span> <span class="fu">sum</span>()</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>correct</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the total number of correct predictions</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>correct <span class="ot">&lt;-</span> confusion_table <span class="sc">|&gt;</span> <span class="fu">diag</span>() <span class="sc">|&gt;</span> <span class="fu">sum</span>()</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>correct</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 89</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>error <span class="ot">&lt;-</span> confusion_table <span class="sc">|&gt;</span> <span class="fu">sum</span>() <span class="sc">-</span> correct</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>error</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the total number of errors</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>error <span class="ot">&lt;-</span> confusion_table <span class="sc">|&gt;</span> <span class="fu">sum</span>() <span class="sc">-</span> correct</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>error</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 12</code></pre>
 </div>
@@ -483,6 +487,7 @@ Levels: mammal bird reptile fish amphibian insect mollusc.et.al</code></pre>
 </section>
 <section id="learn-a-model-and-tune-hyperparameters-on-the-training-data" class="level3">
 <h3 class="anchored" data-anchor-id="learn-a-model-and-tune-hyperparameters-on-the-training-data"><strong>Learn a Model and Tune Hyperparameters on the Training Data</strong></h3>
+<p>The package&nbsp;caret&nbsp;combines training and validation for hyperparameter tuning into a single function called&nbsp;train(). It internally splits the data into training and validation sets and thus will provide you with error estimates for different hyperparameter settings.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> Zoo_train <span class="sc">|&gt;</span></span>
 <span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">train</span>(type <span class="sc">~</span> .,</span>
@@ -516,6 +521,7 @@ Accuracy was used to select the optimal model using the largest value.
 The final value used for the model was cp = 0.</code></pre>
 </div>
 </div>
+<p>In this case, the model with <strong>cp = 0</strong> was selected as the final model due to its perfect accuracy on the training data.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rpart.plot</span>(fit<span class="sc">$</span>finalModel, <span class="at">extra =</span> <span class="dv">2</span>,</span>
 <span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">box.palette =</span> <span class="fu">list</span>(<span class="st">"Gy"</span>, <span class="st">"Gn"</span>, <span class="st">"Bu"</span>, <span class="st">"Bn"</span>, <span class="st">"Or"</span>, <span class="st">"Rd"</span>, <span class="st">"Pu"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -579,10 +585,12 @@ venomousFALSE   0.000</code></pre>
 <p><img src="r-python-exercise3_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>milkFalse has the highest importance score, represented as 100.00 and feathersFalse has an importance score of 55.69 , indicating it is also a significant pre</p>
 </section>
 </section>
 <section id="testing-confusion-matrix-and-confidence-interval-for-accuracy" class="level2">
 <h2 class="anchored" data-anchor-id="testing-confusion-matrix-and-confidence-interval-for-accuracy"><strong>Testing: Confusion Matrix and Confidence Interval for Accuracy</strong></h2>
+<p>Use the best model on the test data</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit, <span class="at">newdata =</span> Zoo_test)</span>
 <span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>pred</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -645,6 +653,7 @@ Balanced Accuracy                  NA       0.97059               1.0000</code><
 </div>
 </div>
 <p>The <strong>pull(type)</strong> function is used to extract the actual values from the “type” column of the <strong>Zoo_test</strong> dataset.</p>
+<p>The accuracy is 0.94 ,and Kappa is 0.92, indicating high performance model.</p>
 </section>
 <section id="model-comparison" class="level2">
 <h2 class="anchored" data-anchor-id="model-comparison"><strong>Model Comparison</strong></h2>
@@ -796,7 +805,8 @@ kNearestNeighbors 0.0104                  </code></pre>
 <p><img src="r-python-exercise3_files/figure-html/unnamed-chunk-43-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Get the 5 best features</p>
+<p>Here milk, feathers and backbone the highest importance score , indicating that they are significant predictors.</p>
+<p>Get 5 best features</p>
 <p><strong>cutoff.k</strong> is used for selecting a specified number of top features based on their importance.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>subset <span class="ot">&lt;-</span> <span class="fu">cutoff.k</span>(weights <span class="sc">|&gt;</span> </span>
@@ -806,13 +816,14 @@ kNearestNeighbors 0.0104                  </code></pre>
 <pre><code>[1] "feathers" "milk"     "backbone" "toothed"  "eggs"    </code></pre>
 </div>
 </div>
+<p>kNearestNeighbors is performing better than CART.</p>
 <p>Use only the best 5 features to build a model&nbsp;</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="fu">as.simple.formula</span>(subset, <span class="st">"type"</span>) <span class="co"># function used to generate a formula in R</span></span>
 <span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>f</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>type ~ feathers + milk + backbone + toothed + eggs
-&lt;environment: 0x0000019caaab96d0&gt;</code></pre>
+&lt;environment: 0x0000025a01b3a258&gt;</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -850,6 +861,7 @@ kNearestNeighbors 0.0104                  </code></pre>
 16 domestic          0.0975</code></pre>
 </div>
 </div>
+<p><strong>gain.ratio</strong>&nbsp;function calculates the gain ratio for each predictor variab</p>
 <section id="feature-subset-selection" class="level3">
 <h3 class="anchored" data-anchor-id="feature-subset-selection"><strong>Feature Subset Selection</strong></h3>
 <p>Often features are related and calculating importance for each feature independently is not optimal. We can use greedy search heuristics.</p>
@@ -1448,6 +1460,7 @@ Tuning parameter 'cp' was held constant at a value of 0.01</code></pre>
 <p><img src="r-python-exercise3_files/figure-html/unnamed-chunk-61-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>To create an imbalanced problem, we want to decide if an animal is an reptile. First, we change the class variable to make it into a binary reptile/no reptile classification problem.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a>Zoo_reptile <span class="ot">&lt;-</span> Zoo <span class="sc">|&gt;</span> </span>
 <span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">type =</span> <span class="fu">factor</span>(Zoo<span class="sc">$</span>type <span class="sc">==</span> <span class="st">"reptile"</span>, </span>
@@ -1501,6 +1514,7 @@ Tuning parameter 'cp' was held constant at a value of 0.01</code></pre>
 </div>
 </div>
 <p>The bar chart to visualize the distribution of the “type” variable.</p>
+<p>Create test and training data. I use here a 50/50 split to make sure that the test set has some samples of the rare reptile class.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
 <span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -1585,6 +1599,7 @@ Prediction   nonreptile reptile
 </section>
 <section id="option-2-balance-data-with-resampling" class="level3">
 <h3 class="anchored" data-anchor-id="option-2-balance-data-with-resampling"><strong>Option 2: Balance Data With Resampling</strong></h3>
+<p>We use stratified sampling with replacement (to oversample the minority/positive class).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb111"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sampling)</span>
 <span id="cb111-2"><a href="#cb111-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1000</span>) <span class="co"># for repeatability</span></span>
@@ -1884,6 +1899,7 @@ Area under the curve: 0.7656</code></pre>
 <p><img src="r-python-exercise3_files/figure-html/unnamed-chunk-84-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>An AUC-ROC score of 0.766 indicates that the model’s performance is relatively good</p>
 </section>
 </section>
 <section id="option-4-use-a-cost-sensitive-classifier" class="level3">
@@ -2053,6 +2069,7 @@ $ type     &lt;fct&gt; mammal, mammal, fish, mammal, mammal, mammal, mammal, fis
 </div>
 <section id="conditional-inference-tree-decision-tree" class="level3">
 <h3 class="anchored" data-anchor-id="conditional-inference-tree-decision-tree"><strong>Conditional Inference Tree (Decision Tree)</strong></h3>
+<p>Conditional Inference Trees is a different kind of decision tree that uses recursive partitioning of dependent variables based on the value of correlations.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb153"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb153-1"><a href="#cb153-1" aria-hidden="true" tabindex="-1"></a>ctreeFit <span class="ot">&lt;-</span> Zoo_train <span class="sc">|&gt;</span> <span class="fu">train</span>(type <span class="sc">~</span> .,</span>
 <span id="cb153-2"><a href="#cb153-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"ctree"</span>,</span>
@@ -2083,6 +2100,7 @@ Accuracy was used to select the optimal model using the largest value.
 The final value used for the model was mincriterion = 0.99.</code></pre>
 </div>
 </div>
+<p>The conditional inference tree model performed very well in terms of accuracy and kappa, and the hyperparameter “mincriterion” was set to 0.99 to achieve this level of performance.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb155"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb155-1"><a href="#cb155-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ctreeFit<span class="sc">$</span>finalModel)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -2092,6 +2110,7 @@ The final value used for the model was mincriterion = 0.99.</code></pre>
 </section>
 <section id="c-4.5-decision-tree" class="level3">
 <h3 class="anchored" data-anchor-id="c-4.5-decision-tree"><strong>C 4.5 Decision Tree</strong></h3>
+<p>The C4.5 algorithm is used in Data Mining as a Decision Tree Classifier which can be employed to generate a decision, based on a certain sample of data (univariate or multivariate predictors).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb156"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb156-1"><a href="#cb156-1" aria-hidden="true" tabindex="-1"></a>C45Fit <span class="ot">&lt;-</span> Zoo_train <span class="sc">|&gt;</span> <span class="fu">train</span>(type <span class="sc">~</span> .,</span>
 <span id="cb156-2"><a href="#cb156-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"J48"</span>,</span>
@@ -2142,7 +2161,7 @@ Accuracy was used to select the optimal model using the largest value.
 The final values used for the model were C = 0.133 and M = 1.</code></pre>
 </div>
 </div>
-<p>The C4.5 algorithm is used in Data Mining as a Decision Tree Classifier which can be employed to generate a decision, based on a certain sample of data (univariate or multivariate predictors).</p>
+<p>The model with the highest Accuracy value was selected as the optimal model.The final values used for the model were&nbsp;<strong>C = 0.133</strong>&nbsp;and&nbsp;<strong>M = 1</strong></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb158"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb158-1"><a href="#cb158-1" aria-hidden="true" tabindex="-1"></a>C45Fit<span class="sc">$</span>finalModel</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -2263,6 +2282,7 @@ Accuracy was used to select the optimal model using the largest value.
 The final values used for the model were threshold = 0.5 and pruned = yes.</code></pre>
 </div>
 </div>
+<p>For each combination of “threshold” and “pruned” settings, we have given the accuracy and Kappa statistics. Here for all the cases it’s 1. The final values used for the model were threshold = 0.5 and pruned = yes.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb166"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb166-1"><a href="#cb166-1" aria-hidden="true" tabindex="-1"></a>rulesFit<span class="sc">$</span>finalModel</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -2319,6 +2339,7 @@ Resampling results:
 Tuning parameter 'C' was held constant at a value of 1</code></pre>
 </div>
 </div>
+<p>The results indicate that the model achieved high accuracy (0.97) and perfect Kappa (0.97).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb170"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb170-1"><a href="#cb170-1" aria-hidden="true" tabindex="-1"></a>svmFit<span class="sc">$</span>finalModel</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -2441,6 +2462,7 @@ Tuning parameter 'subsample' was held
  constant at a value of 0.5</code></pre>
 </div>
 </div>
+<p>The results indicate that the model achieved very high accuracy (0.97) and Kappa (0.96).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb178"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb178-1"><a href="#cb178-1" aria-hidden="true" tabindex="-1"></a>xgboostFit<span class="sc">$</span>finalModel</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -2525,6 +2547,7 @@ Accuracy was used to select the optimal model using the largest value.
 The final values used for the model were size = 5 and decay = 0.01.</code></pre>
 </div>
 </div>
+<p>Different combinations of "size" and "decay" values are tested during hyperparameter tuning to find the combination that results in the best model performance. Accuracy was used to select the optimal model, and the final values used for the model are size = 3 and decay = 0.01.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb182"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb182-1"><a href="#cb182-1" aria-hidden="true" tabindex="-1"></a>nnetFit<span class="sc">$</span>finalModel</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -2597,6 +2620,7 @@ xgboost      0.806   1.000  1.000 0.964   1.000    1    0
 NeuralNet    1.000   1.000  1.000 1.000   1.000    1    0</code></pre>
 </div>
 </div>
+<p>The accuracy values range from 0.7 to 1.00 and Kappa values ranges from 0.7 to 1.000, showing majority of models are performing well.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb188"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb188-1"><a href="#cb188-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lattice)</span>
 <span id="cb188-2"><a href="#cb188-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bwplot</span>(resamps, <span class="at">layout =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>

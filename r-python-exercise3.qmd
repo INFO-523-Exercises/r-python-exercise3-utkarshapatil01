@@ -73,6 +73,8 @@ rpart.plot(tree_default, extra = 2)
 
 ### **Create a Full Tree**
 
+To create a full tree, we set the complexity parameter cp to 0 (split even if it does not improve the tree) and we set the minimum number of observations in a node needed to split to the smallest value of 2.
+
 ```{r}
 tree_full <- Zoo |> 
   rpart(type ~ . , data = _, 
@@ -82,6 +84,8 @@ rpart.plot(tree_full, extra = 2,
             box.palette = list("Gy", "Gn", "Bu", "Bn", 
                                "Or", "Rd", "Pu")) # specify 7 colors
 ```
+
+When **cp = 0** This means that no cost complexity pruning is applied. In other words, the tree is allowed to grow until it perfectly fits the training data, which can result in a very complex, deep, and overfit tree.
 
 ```{r}
 tree_full
@@ -108,11 +112,13 @@ confusion_table
 ```
 
 ```{r}
+# Calculate the total number of correct predictions
 correct <- confusion_table |> diag() |> sum()
 correct
 ```
 
 ```{r}
+# Calculate the total number of errors
 error <- confusion_table |> sum() - correct
 error
 ```
@@ -199,6 +205,8 @@ Zoo_test <- Zoo |> slice(-inTrain)
 
 ### **Learn a Model and Tune Hyperparameters on the Training Data**
 
+The package caret combines training and validation for hyperparameter tuning into a single function called train(). It internally splits the data into training and validation sets and thus will provide you with error estimates for different hyperparameter settings.
+
 ```{r}
 fit <- Zoo_train |>
   train(type ~ .,
@@ -210,6 +218,8 @@ fit <- Zoo_train |>
 
 fit
 ```
+
+In this case, the model with **cp = 0** was selected as the final model due to its perfect accuracy on the training data.
 
 ```{r}
 rpart.plot(fit$finalModel, extra = 2,
@@ -231,7 +241,11 @@ imp
 ggplot(imp)
 ```
 
+milkFalse has the highest importance score, represented as 100.00 and feathersFalse has an importance score of 55.69 , indicating it is also a significant pre
+
 ## **Testing: Confusion Matrix and Confidence Interval for Accuracy**
+
+Use the best model on the test data
 
 ```{r}
 pred <- predict(fit, newdata = Zoo_test)
@@ -246,6 +260,8 @@ confusionMatrix(data = pred,
 ```
 
 The **pull(type)** function is used to extract the actual values from the "type" column of the **Zoo_test** dataset.
+
+The accuracy is 0.94 ,and Kappa is 0.92, indicating high performance model.
 
 ## **Model Comparison**
 
@@ -336,7 +352,9 @@ ggplot(weights,
   ylab("Feature")
 ```
 
-Get the 5 best features
+Here milk, feathers and backbone the highest importance score , indicating that they are significant predictors.
+
+Get 5 best features
 
 **cutoff.k** is used for selecting a specified number of top features based on their importance.
 
@@ -345,6 +363,8 @@ subset <- cutoff.k(weights |>
                    column_to_rownames("feature"), 5)
 subset
 ```
+
+kNearestNeighbors is performing better than CART.
 
 Use only the best 5 features to build a model 
 
@@ -366,6 +386,8 @@ Zoo_train |>
   as_tibble(rownames = "feature") |>
   arrange(desc(attr_importance))
 ```
+
+**gain.ratio** function calculates the gain ratio for each predictor variab
 
 ### **Feature Subset Selection**
 
@@ -469,6 +491,8 @@ Class distribution
 ggplot(Zoo, aes(y = type)) + geom_bar()
 ```
 
+To create an imbalanced problem, we want to decide if an animal is an reptile. First, we change the class variable to make it into a binary reptile/no reptile classification problem.
+
 ```{r}
 Zoo_reptile <- Zoo |> 
   mutate(type = factor(Zoo$type == "reptile", 
@@ -485,6 +509,8 @@ ggplot(Zoo_reptile, aes(y = type)) + geom_bar()
 ```
 
 The bar chart to visualize the distribution of the "type" variable.
+
+Create test and training data. I use here a 50/50 split to make sure that the test set has some samples of the rare reptile class.
 
 ```{r}
 set.seed(1234)
@@ -522,6 +548,8 @@ confusionMatrix(data = predict(fit, testing_reptile),
 ```
 
 ### **Option 2: Balance Data With Resampling**
+
+We use stratified sampling with replacement (to oversample the minority/positive class).
 
 ```{r}
 library(sampling)
@@ -643,6 +671,8 @@ r
 ggroc(r) + geom_abline(intercept = 1, slope = 1, color = "darkgrey")
 ```
 
+An AUC-ROC score of 0.766 indicates that the model's performance is relatively good
+
 ### **Option 4: Use a Cost-Sensitive Classifier**
 
 The implementation of CART in `rpart` can use a cost matrix for making splitting decisions (as parameter `loss`). The matrix has the form
@@ -747,6 +777,8 @@ train_index <- createFolds(Zoo_train$type, k = 10)
 
 ### **Conditional Inference Tree (Decision Tree)**
 
+Conditional Inference Trees is a different kind of decision tree that uses recursive partitioning of dependent variables based on the value of correlations.
+
 ```{r}
 ctreeFit <- Zoo_train |> train(type ~ .,
   method = "ctree",
@@ -756,11 +788,15 @@ ctreeFit <- Zoo_train |> train(type ~ .,
 ctreeFit
 ```
 
+The conditional inference tree model performed very well in terms of accuracy and kappa, and the hyperparameter "mincriterion" was set to 0.99 to achieve this level of performance.
+
 ```{r}
 plot(ctreeFit$finalModel)
 ```
 
 ### **C 4.5 Decision Tree**
+
+The C4.5 algorithm is used in Data Mining as a Decision Tree Classifier which can be employed to generate a decision, based on a certain sample of data (univariate or multivariate predictors).
 
 ```{r}
 C45Fit <- Zoo_train |> train(type ~ .,
@@ -771,7 +807,7 @@ C45Fit <- Zoo_train |> train(type ~ .,
 C45Fit
 ```
 
-The C4.5 algorithm is used in Data Mining as a Decision Tree Classifier which can be employed to generate a decision, based on a certain sample of data (univariate or multivariate predictors).
+The model with the highest Accuracy value was selected as the optimal model.The final values used for the model were **C = 0.133** and **M = 1**
 
 ```{r}
 C45Fit$finalModel
@@ -809,6 +845,8 @@ rulesFit <- Zoo_train |> train(type ~ .,
 rulesFit
 ```
 
+For each combination of "threshold" and "pruned" settings, we have given the accuracy and Kappa statistics. Here for all the cases it's 1. The final values used for the model were threshold = 0.5 and pruned = yes.
+
 ```{r}
 rulesFit$finalModel
 ```
@@ -825,6 +863,8 @@ svmFit <- Zoo_train |> train(type ~.,
     trControl = trainControl(method = "cv", indexOut = train_index))
 svmFit
 ```
+
+The results indicate that the model achieved high accuracy (0.97) and perfect Kappa (0.97).
 
 ```{r}
 svmFit$finalModel
@@ -869,6 +909,8 @@ xgboostFit <- Zoo_train |> train(type ~ .,
 xgboostFit
 ```
 
+The results indicate that the model achieved very high accuracy (0.97) and Kappa (0.96).
+
 ```{r}
 xgboostFit$finalModel
 ```
@@ -884,6 +926,8 @@ nnetFit <- Zoo_train |> train(type ~ .,
   trace = FALSE)
 nnetFit
 ```
+
+Different combinations of \"size\" and \"decay\" values are tested during hyperparameter tuning to find the combination that results in the best model performance. Accuracy was used to select the optimal model, and the final values used for the model are size = 3 and decay = 0.01.
 
 ```{r}
 nnetFit$finalModel
@@ -910,6 +954,8 @@ Calculate summary statistics
 ```{r}
 summary(resamps)
 ```
+
+The accuracy values range from 0.7 to 1.00 and Kappa values ranges from 0.7 to 1.000, showing majority of models are performing well.
 
 ```{r}
 library(lattice)
